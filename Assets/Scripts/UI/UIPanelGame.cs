@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Controllers;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,12 +10,18 @@ public class UIPanelGame : MonoBehaviour,IMenu
     public Text LevelConditionView;
 
     [SerializeField] private Button btnPause;
-
+    [SerializeField] private Button btnRestart;
     private UIMainManager m_mngr;
 
     private void Awake()
     {
         btnPause.onClick.AddListener(OnClickPause);
+        btnRestart.onClick.AddListener(OnRestartGame);
+    }
+
+    private void OnRestartGame()
+    {
+        GameEvents.RestartGame?.Invoke(m_mngr.CurrentLevelMode);
     }
 
     private void OnClickPause()

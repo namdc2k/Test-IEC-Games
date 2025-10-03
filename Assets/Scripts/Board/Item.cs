@@ -134,9 +134,7 @@ public class Item
 
         if (View)
         {
-            //GameObject.Destroy(View.gameObject);
-            PoolItemNormal.DeSpawnItem(View.gameObject);
-            View = null;
+            DestroyView();
         }
     }
 }

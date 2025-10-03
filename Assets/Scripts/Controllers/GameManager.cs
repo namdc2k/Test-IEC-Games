@@ -1,6 +1,7 @@
 ﻿using DG.Tweening;
 using System;
 using System.Collections;
+using Controllers;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
@@ -57,6 +58,34 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         State = eStateGame.MAIN_MENU;
+    }
+    private void OnEnable()
+    {
+        GameEvents.RestartGame += RestartGame;
+    }
+
+    private void OnDisable()
+    {
+        GameEvents.RestartGame -= RestartGame;
+    }
+
+    private void RestartGame(eLevelMode mode)
+    {
+        StartCoroutine(OnRestartGame(mode));
+    }
+
+    IEnumerator OnRestartGame(eLevelMode mode)
+    {
+        if (m_levelCondition != null)
+        {
+            m_levelCondition.ConditionCompleteEvent -= GameOver;
+            Destroy(m_levelCondition);
+            m_levelCondition = null;
+        }
+
+        ClearLevel();
+        yield return new WaitForEndOfFrame();
+        LoadLevel(mode);
     }
 
     // Update is called once per frame
