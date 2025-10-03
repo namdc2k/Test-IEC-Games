@@ -8,7 +8,7 @@ namespace SO
     [CreateAssetMenu(fileName = "ITEM_NORMAL_", menuName = "ITEM/NORMAL", order = 0)]
     public class SOItemNormal : ScriptableObject
     {
-        // TODO: Create Data for item 
+        //TODO: Create Data for item 
         // Quick test 
         public Sprite texture;
 

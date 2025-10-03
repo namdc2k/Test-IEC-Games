@@ -15,9 +15,13 @@ public class NormalItem : Item
         TYPE_SIX,
         TYPE_SEVEN
     }
-
+    private Board _board;
     public eNormalType ItemType;
-
+    
+    public void SetBoard(Board board)
+    {
+        _board = board;
+    }
     public void SetType(eNormalType type)
     {
         ItemType = type;
@@ -81,6 +85,7 @@ public class NormalItem : Item
     protected override void DestroyView()
     {
         PoolItemNormal.DeSpawnItem(View.gameObject);
+        _board.RemoveNormalItem(this);
         View = null;
     }
 }

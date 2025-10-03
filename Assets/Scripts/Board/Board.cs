@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Board
 {
@@ -25,6 +26,10 @@ public class Board
 
     private int m_matchMin;
 
+    private List<NormalItem> m_Normalitems;
+
+    private List<NormalItem.eNormalType> listNeighbour;
+
     public Board(Transform transform, GameSettings gameSettings)
     {
         m_root = transform;
@@ -41,6 +46,11 @@ public class Board
 
     private void CreateBoard()
     {
+        if (m_Normalitems == null)
+            m_Normalitems = new List<NormalItem>();
+        if (listNeighbour == null)
+            listNeighbour = new List<NormalItem.eNormalType>();
+        m_Normalitems.Clear();
         Vector3 origin = new Vector3(-boardSizeX * 0.5f + 0.5f, -boardSizeY * 0.5f + 0.5f, 0f);
         GameObject prefabBG = Resources.Load<GameObject>(Constants.PREFAB_CELL_BACKGROUND);
         for (int x = 0; x < boardSizeX; x++)
@@ -69,7 +79,6 @@ public class Board
                 if (x > 0) m_cells[x, y].NeighbourLeft = m_cells[x - 1, y];
             }
         }
-
     }
 
     internal void Fill()
@@ -100,6 +109,7 @@ public class Board
                     }
                 }
 
+                item.SetBoard(this);
                 item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
                 item.SetView();
                 item.SetViewRoot(m_root);
@@ -138,6 +148,8 @@ public class Board
 
     internal void FillGapsWithNewItems()
     {
+        //TODO: Task Gen New Items
+        listNeighbour.Clear();
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
@@ -146,14 +158,62 @@ public class Board
                 if (!cell.IsEmpty) continue;
 
                 NormalItem item = new NormalItem();
+                if (x - 1 >= 0)
+                    CheckNeighbours(x - 1, y);
 
-                item.SetType(Utils.GetRandomNormalType());
+                if (x + 1 < boardSizeX)
+                    CheckNeighbours(x + 1, y);
+                
+                if (y - 1 >= 0)
+                    CheckNeighbours(x, y - 1);
+
+                if (y + 1 < boardSizeY)
+                    CheckNeighbours(x, y + 1);
+
+
+                item.SetBoard(this);
+                item.SetType(GetNormalType());
                 item.SetView();
                 item.SetViewRoot(m_root);
 
                 cell.Assign(item);
                 cell.ApplyItemPosition(true);
+                m_Normalitems.Add(item);
             }
+        }
+    }
+
+    NormalItem.eNormalType GetNormalType()
+    {
+        var listType = new List<int> { 0, 0, 0, 0, 0, 0, 0 };
+        foreach (var normalItem in m_Normalitems)
+        {
+            listType[(int)normalItem.ItemType]++;
+        }
+
+        foreach (var neighbour in listNeighbour)
+        {
+            listType[(int)neighbour] = 10000;
+        }
+
+        int max = 10000;
+        int cur = Random.Range(0, 7);
+        for (int i = 0; i < listType.Count; i++)
+        {
+            if (max > listType[i])
+            {
+                max = listType[i];
+                cur = i;
+            }
+        }
+        return (NormalItem.eNormalType)cur;
+    }
+
+    private void CheckNeighbours(int x, int y)
+    {
+        if (m_cells[x, y].Item != null && m_cells[x, y].Item as NormalItem != null)
+        {
+            listNeighbour.Add(((NormalItem)m_cells[x, y].Item).ItemType);
         }
     }
 
@@ -179,7 +239,10 @@ public class Board
         cell2.Assign(item);
 
         item.View.DOMove(cell2.transform.position, 0.3f);
-        item2.View.DOMove(cell1.transform.position, 0.3f).OnComplete(() => { if (callback != null) callback(); });
+        item2.View.DOMove(cell1.transform.position, 0.3f).OnComplete(() =>
+        {
+            if (callback != null) callback();
+        });
     }
 
     public List<Cell> GetHorizontalMatches(Cell cell)
@@ -350,7 +413,7 @@ public class Board
         var dir = GetMatchDirection(matches);
 
         var bonus = matches.Where(x => x.Item is BonusItem).FirstOrDefault();
-        if(bonus == null)
+        if (bonus == null)
         {
             return matches;
         }
@@ -367,6 +430,7 @@ public class Board
                         result.Add(cell);
                     }
                 }
+
                 break;
             case eMatchDirection.VERTICAL:
                 foreach (var cell in matches)
@@ -377,6 +441,7 @@ public class Board
                         result.Add(cell);
                     }
                 }
+
                 break;
             case eMatchDirection.ALL:
                 foreach (var cell in matches)
@@ -387,6 +452,7 @@ public class Board
                         result.Add(cell);
                     }
                 }
+
                 break;
         }
 
@@ -614,7 +680,7 @@ public class Board
 
         //look left
         third = null;
-        third = CheckThirdCell(target.NeighbourLeft, main); ;
+        third = CheckThirdCell(target.NeighbourLeft, main);
         if (third != null)
         {
             return third;
@@ -662,6 +728,7 @@ public class Board
 
     public void Clear()
     {
+        m_Normalitems.Clear();
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
@@ -672,6 +739,14 @@ public class Board
                 GameObject.Destroy(cell.gameObject);
                 m_cells[x, y] = null;
             }
+        }
+    }
+
+    public void RemoveNormalItem(NormalItem item)
+    {
+        if (m_Normalitems.Contains(item))
+        {
+            m_Normalitems.Remove(item);
         }
     }
 }
