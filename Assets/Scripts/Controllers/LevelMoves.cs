@@ -35,7 +35,7 @@ public class LevelMoves : LevelCondition
 
     protected override void UpdateText()
     {
-        m_txt.text = string.Format("MOVES:\n{0}", m_moves);
+        m_txt.text = "MOVE:\n" + m_moves.ToString("00");
     }
 
     protected override void OnDestroy()
