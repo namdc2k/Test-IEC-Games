@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b28dc71ab5a243298ddddb04b3b1145a, type: 3}
+  m_Name: ITEM_NORMAL_5
+  m_EditorClassIdentifier: 
+  texture: {fileID: 21300000, guid: 23d4fceb15264594fbd2e61365bdeac4, type: 3}
+  pathName: Assets/Textures/Fish/fish_5.png

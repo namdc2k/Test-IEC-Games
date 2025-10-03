@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Controllers;
 using UnityEngine;
 
 public class NormalItem : Item
@@ -20,6 +21,23 @@ public class NormalItem : Item
     public void SetType(eNormalType type)
     {
         ItemType = type;
+    }
+
+    public override void SetView()
+    {
+        string prefabname = GetPrefabName();
+
+        if (!string.IsNullOrEmpty(prefabname))
+        {
+            //GameObject prefab = Resources.Load<GameObject>(prefabname);
+            GameObject prefab = PoolItemNormal.SpawnItem();
+            prefab.name = prefabname;
+            if (prefab)
+            {
+                View = prefab.transform;
+                View.GetComponent<SpriteRenderer>().sprite = DataContainerManager.GetNormalItem((int)ItemType).texture;
+            }
+        }
     }
 
     protected override string GetPrefabName()
@@ -58,5 +76,11 @@ public class NormalItem : Item
         NormalItem it = other as NormalItem;
 
         return it != null && it.ItemType == this.ItemType;
+    }
+
+    protected override void DestroyView()
+    {
+        PoolItemNormal.DeSpawnItem(View.gameObject);
+        View = null;
     }
 }
